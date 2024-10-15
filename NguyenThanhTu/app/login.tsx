@@ -46,7 +46,6 @@ const Login = () => {
                 onChangeText={(text) => setPassword(text)}
                 placeholderTextColor="#aaa"
             />
-
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                 <Text style={styles.loginButtonText}>Đăng nhập</Text>
             </TouchableOpacity>
