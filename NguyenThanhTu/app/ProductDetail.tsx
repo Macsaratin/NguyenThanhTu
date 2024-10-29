@@ -1,70 +1,46 @@
-import ProductService from '@/service/ProductService';
-import { useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useParams } from 'react-router-dom';
+import ProductService from '../service/ProductService';
 
-const ProductDetail = () => {
-    const route = useRoute();
-    const { id } = route.params || {};
-    const [product, setProduct] = useState(null);
+const ProductDetail: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const result = await ProductService.getDetail(id);
                 setProduct(result.product);
-            } catch (error) {
-                console.error("Error fetching product:", error);
+            } catch (err: any) {
+                console.error(err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
         };
+
         fetchProduct();
     }, [id]);
-    if (!product) {
-        return <Text>Loading product...</Text>;
-    }
 
-    const formatPrice = (price) => {
-        return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-    };
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!product) return <div>No product found.</div>;
 
     return (
-        <ScrollView style={styles.container}>
-            <Image source={{ uri: `http://localhost:8000/images/product/${product.images[0].thumbnail}` }} style={styles.image} />
-            <View style={styles.productDetails}>
-                <Text style={styles.productName}>{product.name}</Text>
-                <Text style={styles.productPrice}>{formatPrice(product.price)}</Text>
-                <Text style={styles.productDescription}>{product.description}</Text>
-            </View>
-        </ScrollView>
+        <div className="product-detail">
+            <h1 className="text-2xl font-bold">{product.name}</h1>
+            {product.images && product.images.length > 0 && (
+                <img
+                    src={`http://localhost:8000/images/products/${product.images[0].thumbnail}`}
+                    alt={product.name}
+                />
+            )}
+            <p className="text-lg">{product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</p>
+            <button className="bg-blue-500 text-white py-2 px-4 mt-4">Add to Bag</button>
+        </div>
     );
 };
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#fff',
-    },
-    image: {
-        width: '100%',
-        height: 300,
-        borderRadius: 10,
-    },
-    productDetails: {
-        marginTop: 20,
-    },
-    productName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginVertical: 10,
-    },
-    productPrice: {
-        fontSize: 20,
-        color: '#888',
-    },
-    productDescription: {
-        fontSize: 16,
-        marginTop: 10,
-    },
-});
 
 export default ProductDetail;

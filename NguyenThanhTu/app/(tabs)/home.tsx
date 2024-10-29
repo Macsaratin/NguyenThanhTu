@@ -31,7 +31,7 @@ const Home = () => {
         router.navigate('/Cart');
     };
     const handleProductDetail = (id) => {
-        router.push('/ProductDetail', `/ProductDetail/${id}`);
+        router.push(`/ProductDetail/${id}`);
     };
     const formatPrice = (price) => {
         return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
