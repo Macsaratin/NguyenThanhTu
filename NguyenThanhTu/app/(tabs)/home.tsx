@@ -7,7 +7,7 @@ import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, To
 
 const Home = () => {
     const [products, setProducts] = useState([]);
-    const [banners, setBanners] = useState([]);
+    const [Banners, setBanners] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const router = useRouter();
 
@@ -17,6 +17,7 @@ const Home = () => {
                 const productResult = await ProductService.getList();
                 const bannerResult = await BannerService.getList();
                 setProducts(productResult.products || []);
+
                 setBanners(bannerResult.banner || []);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -29,9 +30,11 @@ const Home = () => {
     const handleGoToCart = () => {
         router.navigate('/Cart');
     };
-
-    const handleProductDetail = (product) => {
-        router.navigate('ProductDetail', { id: product.id });
+    const handleProductDetail = (id) => {
+        router.push('/ProductDetail', `/ProductDetail/${id}`);
+    };
+    const formatPrice = (price) => {
+        return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     };
 
     const filteredProducts = products.filter((product) =>
@@ -53,8 +56,8 @@ const Home = () => {
             </View>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bannerContainer}>
-                {banners.map((banner) => (
-                    <Pressable key={banner.id} style={styles.bannerWrapper}>
+                {Banners.map((banner, index) => (
+                    <Pressable key={`${banner.id}-${index}`} style={styles.bannerWrapper}>
                         <Image
                             source={{ uri: `http://localhost:8000/images/banner/${banner.image}` }}
                             style={styles.banner}
@@ -71,12 +74,12 @@ const Home = () => {
                 renderItem={({ item }) => {
                     const imageUrl = `http://localhost:8000/images/product/${item.images[0].thumbnail}`;
                     return (
-                        <TouchableOpacity onPress={() => handleProductDetail(item)}>
+                        <TouchableOpacity onPress={() => handleProductDetail(item.id)}>
                             <View style={styles.product}>
                                 <Image source={{ uri: imageUrl }} style={styles.image} />
                                 <View style={styles.productDetails}>
                                     <Text style={styles.productName}>{item.name}</Text>
-                                    <Text style={styles.productPrice}>{item.price} đ</Text>
+                                    <Text style={styles.productPrice}>{formatPrice(item.price)}</Text> {/* Format price */}
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -86,7 +89,6 @@ const Home = () => {
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -102,6 +104,7 @@ const styles = StyleSheet.create({
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        marginRight: 10,
     },
     banner: {
         width: '100%',

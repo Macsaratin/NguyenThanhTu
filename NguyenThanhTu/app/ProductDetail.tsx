@@ -6,30 +6,34 @@ import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 const ProductDetail = () => {
     const route = useRoute();
     const { id } = route.params || {};
-    const [products, setProduct] = useState(null);
+    const [product, setProduct] = useState(null);
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const result = await ProductService.getProductById(id);
-                setProduct(result.products);
+                const result = await ProductService.getDetail(id);
+                setProduct(result.product);
             } catch (error) {
                 console.error("Error fetching product:", error);
             }
         };
         fetchProduct();
     }, [id]);
-
-    if (!products) {
+    if (!product) {
         return <Text>Loading product...</Text>;
     }
+
+    const formatPrice = (price) => {
+        return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    };
+
     return (
         <ScrollView style={styles.container}>
             <Image source={{ uri: `http://localhost:8000/images/product/${product.images[0].thumbnail}` }} style={styles.image} />
             <View style={styles.productDetails}>
-                <Text style={styles.productName}>{products.name}</Text>
-                <Text style={styles.productPrice}>{products.price} đ</Text>
-                <Text style={styles.productDescription}>{products.description}</Text>
+                <Text style={styles.productName}>{product.name}</Text>
+                <Text style={styles.productPrice}>{formatPrice(product.price)}</Text>
+                <Text style={styles.productDescription}>{product.description}</Text>
             </View>
         </ScrollView>
     );

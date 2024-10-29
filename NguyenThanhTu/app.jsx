@@ -6,7 +6,6 @@ import Cart from './app/(tabs)/Cart';
 import Home from './app/(tabs)/home';
 import Login from './app/(tabs)/login';
 import ProductDetail from './app/(tabs)/ProductDetail';
-
 import Register from './app/(tabs)/register';
 
 const Stack = createStackNavigator();
