@@ -1,15 +1,25 @@
 import BannerService from '@/service/BannerService';
 import ProductService from '@/service/ProductService';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    FlatList,
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
-    const [Banners, setBanners] = useState([]);
+    const [banners, setBanners] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const router = useRouter();
+    const navigation = useNavigation();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -17,7 +27,6 @@ const Home = () => {
                 const productResult = await ProductService.getList();
                 const bannerResult = await BannerService.getList();
                 setProducts(productResult.products || []);
-
                 setBanners(bannerResult.banner || []);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -27,12 +36,14 @@ const Home = () => {
         fetchData();
     }, []);
 
-    const handleGoToCart = () => {
-        router.navigate('/Cart');
-    };
     const handleProductDetail = (id) => {
-        router.push(`/ProductDetail/${id}`);
+        navigation.navigate('Products', { id });
     };
+
+    const handleGoToCart = () => {
+        navigation.navigate('Cart'); // Replace 'Cart' with your cart screen name
+    };
+
     const formatPrice = (price) => {
         return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     };
@@ -56,7 +67,7 @@ const Home = () => {
             </View>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.bannerContainer}>
-                {Banners.map((banner, index) => (
+                {banners.map((banner, index) => (
                     <Pressable key={`${banner.id}-${index}`} style={styles.bannerWrapper}>
                         <Image
                             source={{ uri: `http://localhost:8000/images/banner/${banner.image}` }}
@@ -79,16 +90,18 @@ const Home = () => {
                                 <Image source={{ uri: imageUrl }} style={styles.image} />
                                 <View style={styles.productDetails}>
                                     <Text style={styles.productName}>{item.name}</Text>
-                                    <Text style={styles.productPrice}>{formatPrice(item.price)}</Text> {/* Format price */}
+                                    <Text style={styles.productPrice}>{formatPrice(item.price)}</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
                     );
                 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
             />
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -5,5 +5,4 @@ const BannerService = {
         return await httpAxios.get('/banner', { timeout: 1000, });
     },
 }
-
 export default BannerService;

@@ -15,5 +15,5 @@
     "expo-env.d.ts",
     "app/(tabs)/login/login.js",
     "app/(tabs)/HomeScreen/HomeScreen.js"
-  ]
+, "app/Cart.js", "app/Products.js", "app/(tabs)/home.js"  ]
 }
